@@ -200,17 +200,22 @@ jobs:
       go-version: ${{ needs.go.outputs.version }}
       fips-enabled: false
   test-postgres-normal:
-    name: Postgres
+    name: Postgres (ES ${{ matrix.elasticsearch-version }})
     needs: go
+    strategy:
+      fail-fast: false
+      matrix:
+        elasticsearch-version: ["8.9.0", "9.0.0"]
     uses: ./.github/workflows/server-test-template.yml
     secrets: inherit
     with:
-      name: Postgres
+      name: Postgres (ES ${{ matrix.elasticsearch-version }})
       datasource: postgres://mmuser:mostest@postgres:5432/mattermost_test?sslmode=disable&connect_timeout=10
       drivername: postgres
-      logsartifact: postgres-server-test-logs
+      logsartifact: postgres-server-test-logs-es${{ matrix.elasticsearch-version }}
       go-version: ${{ needs.go.outputs.version }}
       fips-enabled: false
+      elasticsearch-version: ${{ matrix.elasticsearch-version }}
   test-postgres-normal-fips:
     # Skip FIPS testing for forks, which won't have docker login credentials.
     if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository

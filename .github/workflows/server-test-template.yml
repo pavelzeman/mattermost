@@ -29,6 +29,10 @@ on:
         required: false
         default: false
         type: boolean
+      elasticsearch-version:
+        required: false
+        type: string
+        default: "9.0.0"
 
 permissions:
   id-token: write
@@ -69,6 +73,8 @@ jobs:
           echo "${{ github.event.pull_request.number }}" > server/pr-number
 
       - name: Run docker compose
+        env:
+          ELASTICSEARCH_VERSION: ${{ inputs.elasticsearch-version }}
         run: |
           cd server/build
           docker compose --ansi never run --rm start_dependencies
