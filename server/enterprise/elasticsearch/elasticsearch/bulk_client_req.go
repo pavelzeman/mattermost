@@ -9,15 +9,15 @@ import (
 	"sync"
 	"time"
 
-	elastic "github.com/elastic/go-elasticsearch/v8"
-	"github.com/elastic/go-elasticsearch/v8/typedapi/core/bulk"
-	"github.com/elastic/go-elasticsearch/v8/typedapi/types"
+	elastic "github.com/elastic/go-elasticsearch/v9"
+	"github.com/elastic/go-elasticsearch/v9/typedapi/core/bulk"
+	"github.com/elastic/go-elasticsearch/v9/typedapi/types"
 	"github.com/mattermost/mattermost/server/public/shared/mlog"
 	"github.com/mattermost/mattermost/server/v8/enterprise/elasticsearch/common"
 )
 
 // ReqBulkClient is an Elasticsearch bulk client based on the
-// go-elasticsearch/v8/typedapi/code/bulk.Bulk type.
+// go-elasticsearch/v9/typedapi/code/bulk.Bulk type.
 // It supports time- and number-of-requests-based thresholds, but not a
 // threshold on the size of the request.
 type ReqBulkClient struct {

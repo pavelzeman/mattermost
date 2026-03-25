@@ -12,7 +12,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elastic/go-elasticsearch/v8"
+	"github.com/elastic/go-elasticsearch/v9"
 
 	"github.com/mattermost/mattermost/server/public/model"
 	"github.com/mattermost/mattermost/server/public/shared/mlog"
@@ -170,7 +170,7 @@ func (worker *ElasticsearchAggregatorWorker) DoJob(job *model.Job) {
 	dateFormat := *worker.jobServer.Config().ElasticsearchSettings.IndexPrefix + common.IndexBasePosts + "_2006_01_02"
 	datedIndexes := []time.Time{}
 
-	postIndexesResult, err := worker.client.API.Indices.
+	postIndexesResult, err := worker.client.Indices.
 		Get(*worker.jobServer.Config().ElasticsearchSettings.IndexPrefix + common.IndexBasePosts + "_*").
 		Do(rctx.Context())
 	if err != nil {

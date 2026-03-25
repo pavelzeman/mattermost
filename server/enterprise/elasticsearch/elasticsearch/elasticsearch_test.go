@@ -10,8 +10,8 @@ import (
 	"strings"
 	"testing"
 
-	elastic "github.com/elastic/go-elasticsearch/v8"
-	"github.com/elastic/go-elasticsearch/v8/typedapi/types"
+	elastic "github.com/elastic/go-elasticsearch/v9"
+	"github.com/elastic/go-elasticsearch/v9/typedapi/types"
 	"github.com/stretchr/testify/suite"
 
 	"github.com/mattermost/mattermost/server/public/model"
@@ -41,7 +41,7 @@ func (s *ElasticsearchInterfaceTestSuite) SetupSuite() {
 	s.th = api4.SetupEnterprise(s.T()).InitBasic(s.T())
 	s.CommonTestSuite.TH = s.th
 	s.CommonTestSuite.GetDocumentFn = func(index, documentID string) (bool, json.RawMessage, error) {
-		resp, err := s.client.API.Get(index, documentID).Do(s.ctx)
+		resp, err := s.client.Get(index, documentID).Do(s.ctx)
 		if resp == nil {
 			return false, nil, err
 		}

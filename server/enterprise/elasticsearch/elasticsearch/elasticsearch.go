@@ -21,18 +21,18 @@ import (
 	"github.com/mattermost/mattermost/server/v8/enterprise/elasticsearch/common"
 	"github.com/mattermost/mattermost/server/v8/platform/services/searchengine"
 
-	elastic "github.com/elastic/go-elasticsearch/v8"
-	"github.com/elastic/go-elasticsearch/v8/typedapi/core/deletebyquery"
-	"github.com/elastic/go-elasticsearch/v8/typedapi/core/search"
-	"github.com/elastic/go-elasticsearch/v8/typedapi/core/updatebyquery"
-	"github.com/elastic/go-elasticsearch/v8/typedapi/types"
-	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/highlighterencoder"
-	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/operator"
-	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/scriptlanguage"
-	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/sortorder"
+	elastic "github.com/elastic/go-elasticsearch/v9"
+	"github.com/elastic/go-elasticsearch/v9/typedapi/core/deletebyquery"
+	"github.com/elastic/go-elasticsearch/v9/typedapi/core/search"
+	"github.com/elastic/go-elasticsearch/v9/typedapi/core/updatebyquery"
+	"github.com/elastic/go-elasticsearch/v9/typedapi/types"
+	"github.com/elastic/go-elasticsearch/v9/typedapi/types/enums/highlighterencoder"
+	"github.com/elastic/go-elasticsearch/v9/typedapi/types/enums/operator"
+	"github.com/elastic/go-elasticsearch/v9/typedapi/types/enums/scriptlanguage"
+	"github.com/elastic/go-elasticsearch/v9/typedapi/types/enums/sortorder"
 )
 
-const elasticsearchMaxVersion = 8
+const elasticsearchMaxVersion = 9
 
 var (
 	purgeIndexListAllowedIndexes = []string{common.IndexBaseChannels}
@@ -103,7 +103,7 @@ func (es *ElasticsearchInterfaceImpl) fetchServerInfo(client *elastic.TypedClien
 
 	// Since we are only retrieving plugins for the Support Packet generation, it doesn't make sense to kill the process if we get an error
 	// Instead, we will log it and move forward
-	resp, err := client.API.Cat.Plugins().Do(context.Background())
+	resp, err := client.Cat.Plugins().Do(context.Background())
 	if err != nil {
 		es.Platform.Log().Warn("Error retrieving elasticsearch plugins", mlog.Err(err))
 	} else {
@@ -197,7 +197,7 @@ func (es *ElasticsearchInterfaceImpl) Start() *model.AppError {
 	}
 
 	// Set up posts index template.
-	_, err = es.client.API.Indices.PutIndexTemplate(*es.Platform.Config().ElasticsearchSettings.IndexPrefix + common.IndexBasePosts).
+	_, err = es.client.Indices.PutIndexTemplate(*es.Platform.Config().ElasticsearchSettings.IndexPrefix + common.IndexBasePosts).
 		Request(common.GetPostTemplate(es.Platform.Config(), opts...)).
 		Do(ctx)
 	if err != nil {
@@ -205,7 +205,7 @@ func (es *ElasticsearchInterfaceImpl) Start() *model.AppError {
 	}
 
 	// Set up channels index template.
-	_, err = es.client.API.Indices.PutIndexTemplate(*es.Platform.Config().ElasticsearchSettings.IndexPrefix + common.IndexBaseChannels).
+	_, err = es.client.Indices.PutIndexTemplate(*es.Platform.Config().ElasticsearchSettings.IndexPrefix + common.IndexBaseChannels).
 		Request(common.GetChannelTemplate(es.Platform.Config())).
 		Do(ctx)
 	if err != nil {
@@ -213,7 +213,7 @@ func (es *ElasticsearchInterfaceImpl) Start() *model.AppError {
 	}
 
 	// Set up users index template.
-	_, err = es.client.API.Indices.PutIndexTemplate(*es.Platform.Config().ElasticsearchSettings.IndexPrefix + common.IndexBaseUsers).
+	_, err = es.client.Indices.PutIndexTemplate(*es.Platform.Config().ElasticsearchSettings.IndexPrefix + common.IndexBaseUsers).
 		Request(common.GetUserTemplate(es.Platform.Config())).
 		Do(ctx)
 	if err != nil {
@@ -221,7 +221,7 @@ func (es *ElasticsearchInterfaceImpl) Start() *model.AppError {
 	}
 
 	// Set up files index template.
-	_, err = es.client.API.Indices.PutIndexTemplate(*es.Platform.Config().ElasticsearchSettings.IndexPrefix + common.IndexBaseFiles).
+	_, err = es.client.Indices.PutIndexTemplate(*es.Platform.Config().ElasticsearchSettings.IndexPrefix + common.IndexBaseFiles).
 		Request(common.GetFileInfoTemplate(es.Platform.Config())).
 		Do(ctx)
 	if err != nil {
@@ -316,7 +316,7 @@ func (es *ElasticsearchInterfaceImpl) getPostIndexNames() ([]string, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(*es.Platform.Config().ElasticsearchSettings.RequestTimeoutSeconds)*time.Second)
 	defer cancel()
 
-	indexes, err := es.client.API.Indices.Get("_all").Do(ctx)
+	indexes, err := es.client.Indices.Get("_all").Do(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -651,11 +651,11 @@ func (es *ElasticsearchInterfaceImpl) SearchPosts(channels model.ChannelList, se
 		HighlightQuery: &types.Query{
 			Bool: fullHighlightsQuery,
 		},
-		Fields: map[string]types.HighlightField{
-			"message":     {},
-			"attachments": {},
-			"url":         {},
-			"hashtag":     {},
+		Fields: []map[string]types.HighlightField{
+			{"message": {}},
+			{"attachments": {}},
+			{"url": {}},
+			{"hashtag": {}},
 		},
 		Encoder: &highlighterencoder.Html,
 	}
@@ -677,7 +677,7 @@ func (es *ElasticsearchInterfaceImpl) SearchPosts(channels model.ChannelList, se
 			Query:     query,
 			Highlight: highlight,
 		}).
-		Sort(types.SortOptions{SortOptions: map[string]types.FieldSort{
+		Sort(&types.SortOptions{SortOptions: map[string]types.FieldSort{
 			"create_at": {Order: &sortorder.Desc},
 		}}).
 		From(page * perPage).
@@ -1948,7 +1948,7 @@ func (es *ElasticsearchInterfaceImpl) SearchFiles(channels model.ChannelList, se
 		Request(&search.Request{
 			Query: query,
 		}).
-		Sort(types.SortOptions{SortOptions: map[string]types.FieldSort{
+		Sort(&types.SortOptions{SortOptions: map[string]types.FieldSort{
 			"create_at": {Order: &sortorder.Desc},
 		}}).
 		From(page * perPage).
@@ -2111,7 +2111,7 @@ func (es *ElasticsearchInterfaceImpl) DeleteFilesBatch(rctx request.CTX, endTime
 }
 
 func checkMaxVersion(client *elastic.TypedClient) (string, int, *model.AppError) {
-	resp, err := client.API.Core.Info().Do(context.Background())
+	resp, err := client.Info().Do(context.Background())
 	if err != nil {
 		return "", 0, model.NewAppError("Elasticsearch.checkMaxVersion", "ent.elasticsearch.start.get_server_version.app_error", map[string]any{"Backend": model.ElasticsearchSettingsESBackend}, "", http.StatusInternalServerError).Wrap(err)
 	}

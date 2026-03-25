@@ -6,8 +6,8 @@ package common
 import (
 	"strconv"
 
-	"github.com/elastic/go-elasticsearch/v8/typedapi/indices/putindextemplate"
-	"github.com/elastic/go-elasticsearch/v8/typedapi/types"
+	"github.com/elastic/go-elasticsearch/v9/typedapi/indices/putindextemplate"
+	"github.com/elastic/go-elasticsearch/v9/typedapi/types"
 	"github.com/mattermost/mattermost/server/public/model"
 	"github.com/mattermost/mattermost/server/public/shared/mlog"
 )

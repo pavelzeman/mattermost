@@ -10,7 +10,7 @@ import (
 
 	"github.com/mattermost/mattermost/server/v8/enterprise/elasticsearch/common"
 
-	"github.com/elastic/go-elasticsearch/v8/esutil"
+	"github.com/elastic/go-elasticsearch/v9/esutil"
 
 	"github.com/mattermost/mattermost/server/public/model"
 	"github.com/mattermost/mattermost/server/public/shared/mlog"

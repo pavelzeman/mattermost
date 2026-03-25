@@ -7,8 +7,8 @@ import (
 	"fmt"
 	"time"
 
-	elastic "github.com/elastic/go-elasticsearch/v8"
-	esTypes "github.com/elastic/go-elasticsearch/v8/typedapi/types"
+	elastic "github.com/elastic/go-elasticsearch/v9"
+	esTypes "github.com/elastic/go-elasticsearch/v9/typedapi/types"
 	"github.com/mattermost/mattermost/server/public/shared/mlog"
 	"github.com/mattermost/mattermost/server/v8/enterprise/elasticsearch/common"
 )

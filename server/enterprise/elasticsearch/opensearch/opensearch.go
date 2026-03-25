@@ -22,14 +22,14 @@ import (
 	"github.com/mattermost/mattermost/server/v8/enterprise/elasticsearch/common"
 	"github.com/mattermost/mattermost/server/v8/platform/services/searchengine"
 
-	"github.com/elastic/go-elasticsearch/v8/typedapi/core/deletebyquery"
-	"github.com/elastic/go-elasticsearch/v8/typedapi/core/search"
-	"github.com/elastic/go-elasticsearch/v8/typedapi/core/updatebyquery"
-	"github.com/elastic/go-elasticsearch/v8/typedapi/types"
-	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/highlighterencoder"
-	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/operator"
-	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/scriptlanguage"
-	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/sortorder"
+	"github.com/elastic/go-elasticsearch/v9/typedapi/core/deletebyquery"
+	"github.com/elastic/go-elasticsearch/v9/typedapi/core/search"
+	"github.com/elastic/go-elasticsearch/v9/typedapi/core/updatebyquery"
+	"github.com/elastic/go-elasticsearch/v9/typedapi/types"
+	"github.com/elastic/go-elasticsearch/v9/typedapi/types/enums/highlighterencoder"
+	"github.com/elastic/go-elasticsearch/v9/typedapi/types/enums/operator"
+	"github.com/elastic/go-elasticsearch/v9/typedapi/types/enums/scriptlanguage"
+	"github.com/elastic/go-elasticsearch/v9/typedapi/types/enums/sortorder"
 	"github.com/opensearch-project/opensearch-go/v4"
 	"github.com/opensearch-project/opensearch-go/v4/opensearchapi"
 )
@@ -667,11 +667,11 @@ func (os *OpensearchInterfaceImpl) SearchPosts(channels model.ChannelList, searc
 		HighlightQuery: &types.Query{
 			Bool: fullHighlightsQuery,
 		},
-		Fields: map[string]types.HighlightField{
-			"message":     {},
-			"attachments": {},
-			"url":         {},
-			"hashtag":     {},
+		Fields: []map[string]types.HighlightField{
+			{"message": {}},
+			{"attachments": {}},
+			{"url": {}},
+			{"hashtag": {}},
 		},
 		Encoder: &highlighterencoder.Html,
 	}

@@ -12,15 +12,15 @@ import (
 	"sync"
 	"time"
 
-	elastic "github.com/elastic/go-elasticsearch/v8"
-	"github.com/elastic/go-elasticsearch/v8/esutil"
-	esTypes "github.com/elastic/go-elasticsearch/v8/typedapi/types"
+	elastic "github.com/elastic/go-elasticsearch/v9"
+	"github.com/elastic/go-elasticsearch/v9/esutil"
+	esTypes "github.com/elastic/go-elasticsearch/v9/typedapi/types"
 	"github.com/mattermost/mattermost/server/public/shared/mlog"
 	"github.com/mattermost/mattermost/server/v8/enterprise/elasticsearch/common"
 )
 
 // DataBulkClient is an Elasticsearch bulk client based on the
-// go-elasticsearch/v8/esutil.BulkIndexer type.
+// go-elasticsearch/v9/esutil.BulkIndexer type.
 // It supports time- and size-based thresholds, but not a threshold on number
 // of requests.
 type DataBulkClient struct {
