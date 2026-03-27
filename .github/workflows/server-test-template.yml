@@ -33,6 +33,10 @@ on:
         required: false
         type: string
         default: "9.0.0"
+      test-target:
+        required: false
+        type: string
+        default: "test-server"
 
 permissions:
   id-token: write
@@ -88,7 +92,7 @@ jobs:
         env:
           BUILD_IMAGE: ${{ steps.build.outputs.BUILD_IMAGE }}
         run: |
-          if [[ ${{ github.ref_name }} == 'master' && ${{ inputs.fullyparallel }} != true ]]; then
+          if [[ ${{ github.ref_name }} == 'master' && ${{ inputs.fullyparallel }} != true && "${{ inputs.test-target }}" == "test-server" ]]; then
             export RACE_MODE="-race"
           fi
           docker run --net ghactions_mm-test \
@@ -103,7 +107,7 @@ jobs:
             -v $PWD:/mattermost \
             -w /mattermost/server \
             $BUILD_IMAGE \
-            make test-server$RACE_MODE BUILD_NUMBER=$GITHUB_HEAD_REF-$GITHUB_RUN_ID
+            make ${{ inputs.test-target }}$RACE_MODE BUILD_NUMBER=$GITHUB_HEAD_REF-$GITHUB_RUN_ID
       - name: Upload coverage to Codecov
         if: ${{ inputs.enablecoverage }}
         uses: codecov/codecov-action@671740ac38dd9b0130fbe1cec585b89eea48d3de # v5.5.2
